@@ -1,0 +1,26 @@
+<!-- series_genre_detail.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ genre }} Series</title>
+</head>
+<body>
+    <h1>{{ genre }} Series</h1>
+    <div class="series-container">
+        {% for series in series %}
+            <div class="series">
+                <img src="{{ series.thumbnail }}" alt="{{ series.title }} Thumbnail">
+                <h2>{{ series.title }}</h2>
+                <p>Characters:</p>
+                <ul>
+                    {% for character in series.characters %}
+                        <li>{{ character.name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

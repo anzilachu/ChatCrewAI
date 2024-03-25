@@ -1,0 +1,86 @@
+{% load static %}
+
+{% include 'navbar.html' %}
+
+<section class="topics-section section-padding pb-0" id="section_3">
+    <div class="container" style="margin-top: 100px;">
+        <div class="row">
+            <div class="col-lg-12 col-12">
+                <div class="section-title-wrap mb-5">
+                    <h4 class="section-title">{{ series.title }}</h4>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0  hai">
+                <div class="custom-block custom-block-overlay">
+                    <a href="#" class="custom-block-image-wrap">
+                        <img src="{{ series.thumbnail }}" class="custom-block-image img-fluid" alt="{{ series.title }}">
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-6 mb-4 mb-lg-0  hai" style="text-align: center;">
+                <p>Engage in lively group conversations with the crew of {{ series.title }}! Enjoy interactive chats where you can connect with each character collectively or individually. Dive into the excitement and bring your favorite series to life in a whole new way.</p>
+                {% if user.is_authenticated %}
+                <a href="{% url 'payment' %}" class="btn custom-btn smoothscroll mt-3">
+                    <i class="fas fa-lock"></i> Group Chat
+                  </a>
+                  
+                {% else %}
+                <a href="{% url 'login' %}" class="btn custom-btn smoothscroll mt-3">Group Chat</a>
+                {% endif %}
+                <a href=".custom-block-info" class="btn custom-btn smoothscroll mt-3">Chat by character</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if series.is_animation_series %}
+
+<div class="col-lg-12 col-md-6 col-6 mb-4 mb-lg-0  hai" style="margin-top: 30px; background-color: rgb(220, 217, 217); display: block; margin: 0 auto; text-align: center;">
+    <p style="color: blue">The character image is the real artist who give life to the animated {{ series.title }}! </p>
+
+</div>
+
+
+{% endif %}
+
+<section class="topics-section section-padding pb-0" id="section_3">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-12">
+                <div class="section-title-wrap mb-5">
+                    <h4 class="section-title">Characters</h4>
+                </div>
+            </div>
+            {% for character in series.characters %}
+        {% if character.photo %}
+        <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0  hai {% if series.is_animation_series %}animation-series{% endif %}">
+            <div class="custom-block custom-block-overlay">
+                <a href="#" class="custom-block-image-wrap">
+                    <img src="{{ character.photo }}" class="custom-block-image img-fluid" alt="{{ character.name }}">
+                </a>
+                <div class="custom-block-info custom-block-overlay-info">
+                    <h5 class="mb-1">
+                        {% if character.name %}
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'chat_with_character' show_name=series.title character_name=character.name %}?character_image_url={{ character.photo }}" class="ni">{{ character.name }}</a>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="ni">{{ character.name }}</a>
+                        {% endif %}
+                    </h5>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'chat_with_character' show_name=series.title character_name=character.name %}?character_image_url={{ character.photo }}" class="btn custom-btn smoothscroll mt-3">Chat Now</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn custom-btn smoothscroll mt-3">Chat Now</a>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}
+
+        </div>
+    </div>
+</section>
+
+{% include 'footer.html' %}

@@ -1,0 +1,37 @@
+{% load static %}
+
+{% include 'navbar.html' %}
+
+<section class="topics-section section-padding pb-0" id="section_3">
+    {% if search_results %}
+    <div class="container" style="margin-top: 100px;">
+        <div class="row">
+            <div class="col-lg-12 col-12">
+                <div class="section-title-wrap mb-5">
+                    <h4 class="section-title">Search Results</h4>
+                </div>
+            </div>
+
+            {% for result in search_results %}
+                <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0 hai">
+                    <div class="custom-block custom-block-overlay">
+                        <a href="{% if result.media_type == 'tv' %}{% url 'searchapp:result_detail' 'tv' result.id %}{% else %}{% url 'searchapp:result_detail' 'movie' result.id %}{% endif %}" class="custom-block-image-wrap">
+                            <img src="{% if result.poster_path %}https://image.tmdb.org/t/p/w500{{ result.poster_path }}{% else %}{% static 'placeholder.png' %}{% endif %}" class="custom-block-image img-fluid" alt="{% if result.media_type == 'tv' %}{{ result.name }}{% else %}{{ result.title }}{% endif %}">
+                        </a>
+                        <div class="custom-block-info custom-block-overlay-info">
+                            <h5 class="mb-1">
+                                <a href="{% if result.media_type == 'tv' %}{% url 'searchapp:result_detail' 'tv' result.id %}{% else %}{% url 'searchapp:result_detail' 'movie' result.id %}{% endif %}" class="ni">{% if result.media_type == 'tv' %}{{ result.name }}{% else %}{{ result.title }}{% endif %}</a>
+                            </h5>
+                            {% if result.num_characters %}
+                            <p class="badge mb-0">{{ result.num_characters }} Characters</p>
+                            {% endif %} <!-- Display characters count -->
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+{% include 'footer.html' %}
