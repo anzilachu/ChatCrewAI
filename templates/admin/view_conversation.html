@@ -1,0 +1,13 @@
+{% load i18n %}
+
+{% block content %}
+<h1>Conversation with {{ character_name }} (User: {{ user.username }})</h1>
+<ul>
+    {% for entry in conversation %}
+    <li>
+        <strong>{{ entry.timestamp }}:</strong> {{ entry.message }}
+    </li>
+    {% endfor %}
+</ul>
+<p><a href="">&larr; Back to list</a></p>
+{% endblock %}

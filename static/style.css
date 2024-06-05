@@ -140,7 +140,7 @@ strong {
 
 
 /*---------------------------------------
-  SECTION               
+f    
 -----------------------------------------*/
 .section-title-wrap {
   position: relative;
@@ -166,6 +166,7 @@ strong {
   z-index: 2;
   margin-bottom: 0;
   padding: 10px 25px;
+  margin-bottom: 20px;
 }
 
 .section-padding {
@@ -267,13 +268,13 @@ main {
 -----------------------------------------*/
 .navbar {
   background-color: transparent;
-  position: absolute;
   top: 0;
   right: 0;
   left: 0;
   z-index: 9;
   padding-top: 20px;
   padding-bottom: 20px;
+  background-color: black;
 }
 
 .navbar .navbar-brand,
@@ -632,8 +633,8 @@ main {
 .custom-block-image {
   border-radius: var(--border-radius-medium);
   display: block;
-  width: 112px;
-  height: 112px;
+  width: 162px;
+  height: 162px;
   /* object-fit: cover; */
 }
 
@@ -796,12 +797,13 @@ main {
 }
 
 .profile-block-image {
-  border-radius: var(--border-radius-large);
+  border-radius: 10px;
   width: 50px;
   height: 50px;
   object-fit: cover;
   margin-right: 10px;
 }
+
 
 .profile-block p strong {
   display: block;
@@ -1149,7 +1151,6 @@ main {
   
   .hero-section {
 	  background-size: 160% 66%; 
-	  /* T o o p l a t e . c o m   C u s t o m i z e d */
 	}
 
   .section-padding {

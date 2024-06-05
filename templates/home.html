@@ -1,5 +1,7 @@
 <!doctype html>
 {% load static %}
+{% load encryption_filters %}
+
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -22,7 +24,10 @@
         <link rel="stylesheet" href="{% static 'bootstrap-icons.css' %}">
         <link rel="stylesheet" href="{% static 'owl.carousel.min.css' %}">
         <link rel="stylesheet" href="{% static 'owl.theme.default.min.css' %}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
         <link href="{% static 'style.css' %}" rel="stylesheet">
+
         <style>
             @media all and (max-width:768px){
                 .container ,.container-sm{
@@ -43,6 +48,32 @@
     font-size: 20px;
 }
             }
+            #loader {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .spinner {
+        border: 16px solid #f3f3f3;
+        border-top: 16px solid #3498db;
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
         </style>
 <!--
 
@@ -54,6 +85,9 @@ https://templatemo.com/tm-584-pod-talk
     </head>
     
     <body>
+        <div id="loader">
+            <div class="spinner"></div>
+        </div>
 
         <main>
 
@@ -82,6 +116,22 @@ https://templatemo.com/tm-584-pod-talk
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'about' %}">About</a>
                         </li>
+                        {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'payment_page' %}">Pricing</a>
+                        </li>
+                        
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Chats
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{% url 'chatted_characters' %}">Character chat</a></li>
+                                <li><a class="dropdown-item" href="{% url 'roleplay_chatted_characters' %}">roleplay chat</a></li>
+                            </ul>
+                        </li>
+                        {% endif %}
                         {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
@@ -113,7 +163,7 @@ https://templatemo.com/tm-584-pod-talk
                         <div class="col-lg-12 col-12">
                             <div class="text-center mb-5 pb-2">
 
-                                <h1 style="color: white;">Connect with your beloved characters on <span style="background-color: rgb(0, 85, 255);">ChatCrew! </span> </h1>
+                                <h1 style="color: white;">Connect with your beloved characters on <span style="background-color: rgb(0, 85, 255);">ChatCrewAI! </span> </h1>
 
                                 <p class="text-white">Now you can interact with characters you love with ChatCrew AI </p>
 
@@ -121,13 +171,29 @@ https://templatemo.com/tm-584-pod-talk
                             </div>
 
                             <div class="owl-carousel owl-theme">
+
+                                {% if user.is_authenticated %}
                                 {% for character in random_characters %}
-                                <div class="owl-carousel-info-wrap item" style="background-color: rgb(0, 0, 0); text-align: center;">
-                                    <img src="{{ character.photo }}" class="owl-carousel-image img-fluid" alt="{{ character.name }}">
-                                    <p style="color: white;">{{ character.name }}</p>
-                                    <p style="color: white;">{{ character.series_name }}</p>
-                                </div>
+                                    <a href="{% url 'chat_with_character' show_name=character.encrypted_series_name encrypted_character_name=character.encrypted_name %}?character_image_url={{ character.encrypted_photo }}">
+                                        <div class="owl-carousel-info-wrap item" style="background-color: rgb(9, 106, 196); text-align: center;">
+                                            <img src="{{ character.photo }}" class="owl-carousel-image img-fluid" alt="{{ character.name }}">
+                                            <p style="color: white;">{{ character.name }}</p>
+                                            <p style="color: white;">{{ character.series_name }}</p>
+                                        </div>
+                                    </a>
                                 {% endfor %}
+                                {% else %}
+                                {% for character in random_characters %}
+                                <a href="{% url 'login' %}">
+                                    <div class="owl-carousel-info-wrap item" style="background-color: rgb(0, 0, 0); text-align: center;">
+                                        <img src="{{ character.photo }}" class="owl-carousel-image img-fluid" alt="{{ character.name }}">
+                                        <p style="color: white;">{{ character.name }}</p>
+                                        <p style="color: white;">{{ character.series_name }}</p>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                            {% endif %}
+     
                             </div>
                             
                             
@@ -135,6 +201,88 @@ https://templatemo.com/tm-584-pod-talk
                         </div>
 
                     </div>
+                </div>
+            </section>
+
+            <section class="latest-podcast-section section-padding pb-0" id="section_2">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-12 col-12">
+                            <div class="section-title-wrap mb-5">
+                                <h4 class="section-title">Roleplay !</h4>
+                                <p>Become your hero: Chat with AI-powered characters from any world</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-12 mb-4 mb-lg-0">
+                            <div class="custom-block d-flex" id="choose_character">
+                                <div class="">
+                                    <div class="custom-block-icon-wrap">
+                                        <div class="section-overlay"></div>
+                                        <a href="#" class="custom-block-image-wrap">
+                                            <img src="{% static 'roleplay1.png' %}" class="custom-block-image img-fluid" alt="{{ series.title }}">
+                                        </a>
+                                    </div>
+                                </div>
+            
+                                <div class="custom-block-info">
+                                    <h5 class="mb-2">
+                                        <a href="{% url 'select_roleplay' %}">
+                                            Choose your Character
+                                        </a>
+                                    </h5>
+                                    <div class="d-flex">
+                                       
+                                        <div class="profile-block me-3">
+                                            <img src="{% static 'superman.png' %}" class="profile-block-image img-fluid" alt="{{ actor.name }}">
+                                        </div>
+                                        <div class="profile-block me-3">
+                                            <img src="{% static 'wonderwomen.png' %}" class="profile-block-image img-fluid" alt="{{ actor.name }}">
+                                        </div>
+                                        <div class="profile-block me-3">
+                                            <img src="{% static 'greenhero.png' %}" class="profile-block-image img-fluid" alt="{{ actor.name }}">
+                                        </div>
+                                        <div class="profile-block me-3">
+                                            <img src="{% static 'flash.png' %}" class="profile-block-image img-fluid" alt="{{ actor.name }}">
+                                        </div>                   
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-12 mb-4 mb-lg-0">
+                            <div class="custom-block d-flex " id="choose_opponent">
+                                <div class="">
+                                    <div class="custom-block-icon-wrap">
+                                        <div class="section-overlay"></div>
+                                        <a href="#" class="custom-block-image-wrap">
+                                            <img src="{% static 'roleplay2.png' %}" class="custom-block-image img-fluid" alt="{{ series.title }}">
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="custom-block-info">
+                                    <h5 class="mb-2">
+                                        <a href="{% url 'select_roleplay' %}">
+                                            Choose your Opponent 
+                                        </a>
+                                    </h5>
+    
+                                    <div class="d-flex">
+                                        <div class="profile-block me-3">
+                                            <img src="{% static 'spiderman.png' %}" class="profile-block-image img-fluid" alt="{{ actor.name }}">
+                                        </div>
+                                        <div class="profile-block me-3">
+                                            <img src="{% static 'ironman.png' %}" class="profile-block-image img-fluid" alt="{{ actor.name }}">
+                                        </div>
+                                        <div class="profile-block me-3">
+                                            <img src="{% static 'blackwidow.png' %}" class="profile-block-image img-fluid" alt="{{ actor.name }}">
+                                        </div>
+                                        <div class="profile-block me-3">
+                                            <img src="{% static 'thor.png' %}" class="profile-block-image img-fluid" alt="{{ actor.name }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>   
                 </div>
             </section>
 
@@ -147,16 +295,16 @@ https://templatemo.com/tm-584-pod-talk
                             </div>
                         </div>
             
-                        {% for series in popular_series|slice:":8" %}
+                        {% for series in popular_series %}
                             <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0 hai">
                                 <div class="custom-block custom-block-overlay">
-                                    <a href="{% url 'series_detail' series.id %}" class="custom-block-image-wrap">
+                                    <a href="{% url 'series_detail' series.encrypted_id %}" class="custom-block-image-wrap">
                                         <img src="{{ series.image }}" class="custom-block-image img-fluid" alt="{{ series.title }}">
                                     </a>
 
                                     <div class="custom-block-info custom-block-overlay-info">
                                         <h5 class="mb-1">
-                                            <a href="{% url 'series_detail' series.id %}" class="ni">{{ series.title }}</a>
+                                            <a href="{% url 'series_detail' series.encrypted_id %}" class="ni">{{ series.title }}</a>
                                         </h5>
                                         <p class="badge mb-0">{{ series.num_characters }} Characters</p> <!-- Display characters count -->
                                     </div>
@@ -164,75 +312,48 @@ https://templatemo.com/tm-584-pod-talk
                             </div>
                         {% endfor %}
 
-                        <a href="{% url 'popular_series' %}" class="btn custom-btn smoothscroll mt-3" style="width: 30%; display: block; margin: 0 auto;">View More</a>
+                        <a href="{% url 'popular_series' %}" class="btn custom-btn smoothscroll mt-3 view-more" style="text-align: center; display: block; margin: 0 auto;">View More</a>
+                            <style>
+                                .view-more {
+                                    width: 20%;
+                                }
+                                @media only screen and (max-width: 767px) {
+                                .view-more {
+                                    width: 50%; /* Adjust width as needed */
+                                }
+                                }
+                            </style>
+                       
                     </div>
                 </div>
             </section>
             
-            
-
-
-            <section class="topics-section section-padding pb-0" id="section_3">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-12 col-12">
-                            <div class="section-title-wrap mb-5">
-                                <h4 class="section-title">Recent Series</h4>
-                            </div>
-                        </div>
-                
-                        {% for series in recent_series|slice:":8" %}
-                        <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0 hai">
-                            <div class="custom-block custom-block-overlay">
-                                <a href="{% url 'series_detail' series.id %}" class="custom-block-image-wrap">
-                                    <img src="{{ series.thumbnail }}" class="custom-block-image img-fluid" alt="{{ series.title }}">
-                                </a>
-                
-                                <div class="custom-block-info custom-block-overlay-info">
-                                    <h5 class="mb-1">
-                                        <a href="{% url 'series_detail' series.id %}" class="ni">{{ series.title }}</a>
-                                    </h5>
-                                    <p class="badge mb-0">{{ series.num_characters }} Characters</p>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                        <a href="{% url 'recent_series' %}" class="btn custom-btn smoothscroll mt-3" style="width: 30%; display: block; margin: 0 auto;">View More</a>
-                    </div>
-                </div>
-            </section>
-
             <section class="latest-podcast-section section-padding pb-0" id="section_2">
                 <div class="container">
                     <div class="row justify-content-center">
                         <div class="col-lg-12 col-12">
                             <div class="section-title-wrap mb-5">
-                                <h4 class="section-title">What's New</h4>
-                                <p>Now have a group conversation with all the characters</p>
+                                <h4 class="section-title">Fan Chat!</h4>
+                                <p>Connect with your fandom crew! Discuss about your favorite scene / character's</p>
                             </div>
                         </div>
                         
                         {% for series in random_popular_series %}
                         <div class="col-lg-6 col-12 mb-4 mb-lg-0">
+                            
                             <div class="custom-block d-flex">
                                 <div class="">
                                     <div class="custom-block-icon-wrap">
                                         <div class="section-overlay"></div>
-                                        <a href="#" class="custom-block-image-wrap">
+                                        <a href="{% url 'fan_chat' encrypted_show_name=series.encrypted_title %}" class="custom-block-image-wrap">
                                             <img src="{{ series.image }}" class="custom-block-image img-fluid" alt="{{ series.title }}">
-                                        </a>
-                                    </div>
-            
-                                    <div class="mt-2">
-                                        <a href="#" class="btn custom-btn">
-                                            Group chat
                                         </a>
                                     </div>
                                 </div>
             
                                 <div class="custom-block-info">
                                     <h5 class="mb-2">
-                                        <a href="#">
+                                        <a href="{% url 'fan_chat' encrypted_show_name=series.encrypted_title %}">
                                             {{ series.title }}
                                         </a>
                                     </h5>
@@ -245,7 +366,17 @@ https://templatemo.com/tm-584-pod-talk
                                         {% endfor %}
                                     </div>
             
-                                    <p class="mb-0">Fans {{ series.viewers }}</p>
+                                    <div class="mt-2">
+                                        {% if user.is_authenticated %}
+                                        <a href="{% url 'fan_chat' encrypted_show_name=series.encrypted_title %}" class="btn custom-btn">
+                                            Connect
+                                        </a>
+                                        {% else %}
+                                        <a href="{% url 'login' %}" class="btn custom-btn">
+                                            Connect
+                                        </a>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -253,35 +384,8 @@ https://templatemo.com/tm-584-pod-talk
                     </div>
                 </div>
             </section>
-            <section class="topics-section section-padding pb-0" id="section_3">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-12 col-12">
-                            <div class="section-title-wrap mb-5">
-                                <h4 class="section-title">Recent Movies</h4>
-                            </div>
-                        </div>
-                            
-                        {% for movie in recent_movies|slice:":8" %}
-                        <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0 hai">
-                            <div class="custom-block custom-block-overlay">
-                                <a href="{% url 'movie_detail' movie.id %}" class="custom-block-image-wrap">
-                                    <img src="{{ movie.thumbnail }}" class="custom-block-image img-fluid" alt="{{ movie.title }}">
-                                </a>
-                            
-                                <div class="custom-block-info custom-block-overlay-info">
-                                    <h5 class="mb-1">
-                                        <a href="{% url 'movie_detail' movie.id %}" class="ni">{{ movie.title }}</a>
-                                    </h5>
-                                    <p class="badge mb-0">{{ movie.num_characters }} Characters</p>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                        <a href="{% url 'recent_movies' %}" class="btn custom-btn smoothscroll mt-3" style="width: 30%; display: block; margin: 0 auto;">View More</a>
-                    </div>
-                </div>
-            </section>
+            
+
 
             <section class="popular-movies-section section-padding pb-0" id="section_4">
                 <div class="container">
@@ -292,29 +396,102 @@ https://templatemo.com/tm-584-pod-talk
                             </div>
                         </div>
             
-                        {% for movie in popular_movies|slice:":8" %}
+                        {% for movie in popular_movies %}
                         <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0 hai">
                             <div class="custom-block custom-block-overlay">
-                                <a href="{% url 'movie_detail' movie.id %}" class="custom-block-image-wrap">
+                                <a href="{% url 'movie_detail' movie.encrypted_id %}" class="custom-block-image-wrap">
                                     <img src="{{ movie.image }}" class="custom-block-image img-fluid" alt="{{ movie.title }}">
                                 </a>
             
                                 <div class="custom-block-info custom-block-overlay-info">
                                     <h5 class="mb-1">
-                                        <a href="{% url 'movie_detail' movie.id %}" class="ni">{{ movie.title }}</a>
+                                        <a href="{% url 'movie_detail' movie.encrypted_id %}" class="ni">{{ movie.title }}</a>
                                     </h5>
                                     <p class="badge mb-0">{{ movie.num_characters }} Characters</p>
                                 </div>
                             </div>
                         </div>
                         {% endfor %}
-                        <a href="{% url 'popular_movies' %}" class="btn custom-btn smoothscroll mt-3" style="width: 30%; display: block; margin: 0 auto;">View More</a>
+                        <a href="{% url 'popular_movies' %}" class="btn custom-btn smoothscroll mt-3 view-more" style="text-align: center; display: block; margin: 0 auto;">View More</a>
                     </div>
                 </div>
             </section>
-            
-            
- 
+
+            <!-- <section class="latest-podcast-section section-padding pb-0" id="section_2">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-12 col-12">
+                            <div class="section-title-wrap mb-5">
+                                <h4 class="section-title">Date AI Actors</h4>
+                                <p>Now you can try dating with your AI fictional characters</p>
+                            </div>
+                        </div>
+
+                        <div class="custom-block" style="align-items: center; text-align: center;">
+                        <div class="col-lg-12 col-12 mb-4 mb-lg-0">
+                            <div class="custom-carousel">
+                                <div class="custom-carousel-inner">
+                                    {% for character in random_characters %}
+                                    <div class="custom-carousel-item">
+                                        <div class="card">
+                                            <img src="{{ character.photo }}" class="card-img-top" alt="{{ character.name }}">
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div><br><br>
+                        <a href="{% url 'date_characters' %}" class="btn custom-btn" style="width: 30%;">
+                            Start
+                        </a>
+                        </div>
+                        
+                    </div>
+                </div>
+            </section> -->
+            <style>
+                .custom-carousel {
+                    position: relative;
+                    width: 100%;
+                    overflow: hidden;
+                }
+                
+                .custom-carousel-inner {
+                    display: flex;
+                    transition: transform 0.5s ease;
+                }
+                
+                .custom-carousel-item {
+                    min-width: 20%; /* Adjust this value to fit the number of cards you want to show at once */
+                    box-sizing: border-box;
+                    padding: 15px;
+                }
+                
+                .card {
+                    background: #fff;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    overflow: hidden;
+                    text-align: center;
+                }
+                
+                .card img {
+                    width: 100%;
+                    height: 200px;
+                    object-fit: cover;
+                }
+                
+                .card-body {
+                    padding: 15px;
+                }
+                
+                .custom-carousel-inner .custom-carousel-item {
+                    flex: 0 0 20%; /* Each item takes up 20% of the container's width */
+                }
+                </style>
+
+
+
         </main>
 
 
@@ -325,10 +502,55 @@ https://templatemo.com/tm-584-pod-talk
 
 
         <!-- JAVASCRIPT FILES -->
+        <script>
+            let carouselIndex = 0;
+            
+            function moveCarousel() {
+                const carouselInner = document.querySelector('.custom-carousel-inner');
+                const items = document.querySelectorAll('.custom-carousel-item');
+                const itemWidth = items[0].clientWidth + parseInt(window.getComputedStyle(items[0]).marginRight);
+                const totalItems = items.length;
+                const visibleItems = Math.floor(carouselInner.parentElement.clientWidth / itemWidth);
+            
+                carouselIndex++;
+                if (carouselIndex > totalItems - visibleItems) {
+                    carouselIndex = 0; // Reset to the beginning
+                }
+            
+                carouselInner.style.transform = `translateX(-${carouselIndex * itemWidth}px)`;
+            }
+            
+            // Move carousel every 3 seconds
+            setInterval(moveCarousel, 3000);
+            document.addEventListener('DOMContentLoaded', function() {
+                // Get references to the clickable divs
+                const chooseCharacterDiv = document.getElementById('choose_character');
+                const chooseOpponentDiv = document.getElementById('choose_opponent');
+
+                // Add click event listeners to the divs
+                chooseCharacterDiv.addEventListener('click', function() {
+                    window.location.href = "{% url 'select_roleplay' %}";
+                });
+
+                chooseOpponentDiv.addEventListener('click', function() {
+                    window.location.href = "{% url 'select_roleplay' %}";
+                });
+            });
+            </script>
+            <script>
+                window.addEventListener('load', function () {
+                    var loader = document.getElementById('loader');
+                    loader.style.display = 'none';
+                });
+            </script>
+            
+            
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
         <script src="{% static 'js/owl.carousel.min.js' %}"></script>
         <script src="{% static 'js/custom.js' %}"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 
     </body>
 </html>

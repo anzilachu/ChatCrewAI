@@ -21,83 +21,51 @@
             width: 100%;
             background-color: #fff;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            height: 100vh; /* Set height to fill the viewport */
             display: flex;
-            flex-direction: column; /* Arrange children vertically */
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .chat-header {
-    position: relative; /* Ensure relative positioning for absolute child */
-    background-color: #6c5ce7;
-    color: #fff;
-    padding: 20px;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+            background-color: #6c5ce7;
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
 
-.exit-chat-button {
-    background-color: #304ed6;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 5px; /* Add a small gap between character name and button */
-}
-
-
-@media (max-width: 768px) {
-    .avatar-container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .exit-chat-button {
-        margin-top: 10px; /* Adjust as needed */
-        font-size: 14px; /* Optionally reduce font size */
-        padding: 5px 10px;
-    }
-}
-
-@media (min-width: 769px) {
-    .avatar-container {
-        justify-content: flex-start; /* Revert to original alignment */
-    }
-
-    .exit-chat-button {
-        margin-left: auto; /* Move button to the right */
-    }
-}
-
-.exit-chat-button:hover {
-    background-color: #b33939; /* Hover color */
-}
-
-
-.avatar-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px; /* Adjust spacing between avatar and title */
-}
-
-.avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    margin-right: 10px;
-    object-fit: cover;
-}
-
+        .chat-header img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            margin-right: 10px;
+            background-color: #6c5ce7;
+            border: 2px solid #fff;
+        }
 
         .chat-title {
+            flex-grow: 1;
             margin: 0;
             font-size: 1.5rem;
             font-weight: bold;
+            text-align: center;
+        }
+
+        .exit-chat-button {
+            background-color: #304ed6;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .exit-chat-button:hover {
+            background-color: #b33939;
         }
 
         .chat-history {
@@ -105,7 +73,7 @@
             overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: #6c5ce7 #f0f0f0;
-            flex-grow: 1; /* Grow to fill available space */
+            flex-grow: 1;
         }
 
         .chat-history::-webkit-scrollbar {
@@ -140,13 +108,34 @@
         .sent .message-content {
             background-color: #8275e0;
             color: white;
-            
+            margin-left: auto;
+        }
+
+        .received .message-content {
+            margin-right: auto;
         }
 
         .message-text {
             margin: 0;
             word-wrap: break-word;
         }
+
+        .avatar_name {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+            object-fit: cover;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 50%; /* Added border-radius to make it round */
+        }
+
 
         .chat-form {
             padding: 20px;
@@ -180,36 +169,46 @@
         .send-button:hover {
             background-color: #4a3cc5;
         }
-        .avatar_name {
-            display: flex;
-            align-items: center; /* Align items vertically */
-            margin-bottom: 10px; /* Adjust spacing if needed */
-        }
 
-        .avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-right: 10px;
-            object-fit: cover;
-        }
+        @media (max-width: 768px) {
+            .chat-title {
+                font-size: 1.2rem;
+            }
 
-        .user-name {
-            font-weight: bold;
-            color: #333;
-            margin: 0; /* Reset margin */
-        }
+            .chat-header img {
+                width: 40px;
+                height: 40px;
+            }
 
+            .exit-chat-button {
+                padding: 5px 10px;
+                font-size: 0.8rem;
+            }
+
+            .chat-history {
+                padding: 10px;
+            }
+
+            .chat-form {
+                padding: 10px;
+            }
+
+            .form-control {
+                font-size: 0.9rem;
+            }
+
+            .send-button {
+                padding: 5px 10px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <img src="{{ character_image_url }}" alt="{{ character_name }}" class="avatar">
-            <h2 class="chat-title">Chat with {{ character_name }} from {{show_name}}</h2>
-            <!-- Exit Chat button -->
+            <!-- <img src="{{ character_image_url }}" alt="{{ character_name }}"> -->
+            <h2 class="chat-title">Chat with {{ character_name }} from {{ show_name }}</h2>
             <button class="exit-chat-button" onclick="goBack()">Exit Chat</button>
-            <!-- Optionally add settings icon or other features -->
         </div>
         <div class="chat-history">
             {% for message in conversation %}
@@ -217,30 +216,23 @@
                     <!-- Received message from character -->
                     <div class="chat-message received">
                         <div class="message-content">
-                            <!-- Display character's avatar and name -->
                             <div class="avatar_name">
                                 <img src="{{ character_image_url }}" alt="{{ character_name }}" class="avatar">
                                 <span class="user-name">{{ character_name }}</span>
                             </div>
-                            <!-- Display character's message -->
                             <p class="message-text">{{ message.text }}</p>
-                            <!-- Optionally add timestamp or other features -->
                         </div>
                     </div>
-                    
                 {% else %}
                     <!-- Sent message from user -->
                     <div class="chat-message sent">
                         <div class="message-content">
-                            <!-- Display user's message -->
                             <p class="message-text">{{ message.text }}</p>
-                            <!-- Optionally add timestamp or other features -->
                         </div>
                     </div>
                 {% endif %}
             {% endfor %}
         </div>
-        <!-- Form for user input -->
         <form method="POST" class="chat-form">
             {% csrf_token %}
             <input type="text" class="form-control" name="user_input" placeholder="Type your message...">
@@ -249,18 +241,19 @@
             </button>
         </form>
     </div>
-    <!-- Optional: Include JavaScript libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/js/all.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.querySelector('.chat-form');
             const chatHistory = document.querySelector('.chat-history');
     
-            // Scroll to bottom when the page loads
             scrollToBottom();
     
             form.addEventListener('submit', function (event) {
-                event.preventDefault(); // Prevent default form submission behavior
+                event.preventDefault();
+                const inputField = document.querySelector('.form-control');
+                const userInput = inputField.value.trim();
+                if (!userInput) return;
     
                 const formData = new FormData(form);
     
@@ -268,19 +261,23 @@
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-CSRFToken': '{{ csrf_token }}' // Add CSRF token to headers
+                        'X-CSRFToken': '{{ csrf_token }}'
                     }
                 })
                 .then(response => response.json())
                 .then(data => {
-                    updateChatHistory(data.user_input, true); // Update chat history with user input, marking it as user's message
-                    scrollToBottom(); // Scroll to bottom after submitting
-                    simulateTyping(); // Simulate typing before showing AI response
-                    setTimeout(function () {
-                        updateChatHistory(data.ai_response, false, '{{ character_image_url }}'); // Update chat history with AI response after a delay
-                        scrollToBottom(); // Scroll to bottom after adding new messages
-                    }, 1500); // Adjust the delay as needed (in milliseconds)
-                    clearInputField(); // Clear input field after submitting
+                    updateChatHistory(data.user_input, true);
+                    scrollToBottom();
+                    if (data.limit_reached) {
+                        displayLimitReachedMessage(data.ai_response, data.payment_url);
+                    } else {
+                        simulateTyping();
+                        setTimeout(function () {
+                            updateChatHistory(data.ai_response, false, '{{ character_image_url }}');
+                            scrollToBottom();
+                        }, 1500);
+                        clearInputField();
+                    }
                 })
                 .catch(error => console.error('Error:', error));
             });
@@ -312,18 +309,36 @@
                 chatHistory.appendChild(messageElement);
             }
     
+            function displayLimitReachedMessage(message, paymentUrl) {
+                const messageElement = document.createElement('div');
+                messageElement.className = 'chat-message received';
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                const messageText = document.createElement('p');
+                messageText.className = 'message-text';
+                messageText.textContent = message;
+                messageText.style.color = 'red';
+                messageText.style.cursor = 'pointer';
+                messageText.addEventListener('click', function() {
+                    window.location.href = paymentUrl;
+                });
+                messageContent.appendChild(messageText);
+                messageElement.appendChild(messageContent);
+                chatHistory.appendChild(messageElement);
+            }
+    
             function simulateTyping() {
                 const typingIndicator = document.createElement('div');
                 typingIndicator.className = 'typing-indicator';
                 typingIndicator.innerHTML = '<p class="typing-text">Typing...</p>';
                 chatHistory.appendChild(typingIndicator);
                 setTimeout(function () {
-                    typingIndicator.remove(); // Remove typing indicator after a delay
-                }, 1000); // Adjust the delay as needed (in milliseconds)
+                    typingIndicator.remove();
+                }, 1000);
             }
     
             function clearInputField() {
-                document.querySelector('.form-control').value = ''; // Clear input field
+                document.querySelector('.form-control').value = '';
             }
     
             function scrollToBottom() {
@@ -331,12 +346,8 @@
             }
         });
         function goBack() {
-        window.history.back();
-    }
+            window.history.back();
+        }
     </script>
-    
-    
-    
-    
 </body>
 </html>

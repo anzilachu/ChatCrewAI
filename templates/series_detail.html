@@ -1,86 +1,159 @@
 {% load static %}
-
 {% include 'navbar.html' %}
+<style>
+    .custom-btn-1 {
+        background: var(--custom-btn-bg-color);
+        border: 2px solid transparent;
+        border-radius: var(--border-radius-large);
+        color: var(--white-color);
+        font-family: var(--title-font-family);
+        font-size: var(--p-font-size);
+        font-weight: var(--font-weight-semibold);
+        line-height: normal;
+        width: 165px;
+        transition: all 0.3s;
+    }
+    .custom-btn-1:hover {
+        background-color: rgb(2, 255, 133);
+    }
+    .section-padding1 {
+        padding-top: 1px;
+        padding-bottom: 100px;
+        margin-bottom: 50px;
 
-<section class="topics-section section-padding pb-0" id="section_3">
+        }
+</style>
+
+<section class="topics-section section-padding1 pb-0" id="section_3">
     <div class="container" style="margin-top: 100px;">
         <div class="row">
             <div class="col-lg-12 col-12">
                 <div class="section-title-wrap mb-5">
-                    <h4 class="section-title">{{ series.title }}</h4>
+                    <h4 class="section-title" id="">{{series.title}}</h4>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0  hai">
+            <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0 hai">
                 <div class="custom-block custom-block-overlay">
                     <a href="#" class="custom-block-image-wrap">
-                        <img src="{{ series.thumbnail }}" class="custom-block-image img-fluid" alt="{{ series.title }}">
+                        <img src="{% if series.thumbnail %}{{ series.thumbnail }}{% else %}{% static 'placeholder.png' %}{% endif %}" class="custom-block-image img-fluid" alt="{{ series.title }}">
                     </a>
                 </div>
             </div>
-            <div class="col-lg-6 col-md-6 col-6 mb-4 mb-lg-0  hai" style="text-align: center;">
-                <p>Engage in lively group conversations with the crew of {{ series.title }}! Enjoy interactive chats where you can connect with each character collectively or individually. Dive into the excitement and bring your favorite series to life in a whole new way.</p>
+            <div class="col-lg-6 col-md-6 col-6 mb-4 mb-lg-0 hai" style="text-align: center;">
+                <p>Welcome to the world of {{ series.title }}! </p>
                 {% if user.is_authenticated %}
-                <a href="{% url 'payment' %}" class="btn custom-btn smoothscroll mt-3">
-                    <i class="fas fa-lock"></i> Group Chat
-                  </a>
-                  
+                <a href="{% url 'fan_chat' encrypted_show_name=series.encrypted_show_name %}" class="btn custom-btn-1 smoothscroll mt-3">Fan Chat</a>
+
                 {% else %}
-                <a href="{% url 'login' %}" class="btn custom-btn smoothscroll mt-3">Group Chat</a>
+                <a href="{% url 'login' %}" class="btn custom-btn-1 smoothscroll mt-3">Fan Chat</a>
                 {% endif %}
-                <a href=".custom-block-info" class="btn custom-btn smoothscroll mt-3">Chat by character</a>
+                <button id="toggle-view" class="btn custom-btn-1 smoothscroll mt-3">Chat by Actors</button>
             </div>
         </div>
     </div>
 </section>
 
 {% if series.is_animation_series %}
-
-<div class="col-lg-12 col-md-6 col-6 mb-4 mb-lg-0  hai" style="margin-top: 30px; background-color: rgb(220, 217, 217); display: block; margin: 0 auto; text-align: center;">
-    <p style="color: blue">The character image is the real artist who give life to the animated {{ series.title }}! </p>
-
+<div class="col-lg-12 col-md-6 col-6 mb-4 mb-lg-0 hai" style="margin-top: 30px; background-color: rgb(220, 217, 217); display: block; margin: 0 auto; text-align: center;">
+    <p style="color: blue">The character image is the real artist's who give life to the animated {{ series.title }}!</p>
 </div>
-
-
 {% endif %}
 
-<section class="topics-section section-padding pb-0" id="section_3">
+<section class="topics-section section-padding1 pb-0" id="section_3">
     <div class="container">
-        <div class="row">
-            <div class="col-lg-12 col-12">
-                <div class="section-title-wrap mb-5">
-                    <h4 class="section-title">Characters</h4>
-                </div>
-            </div>
-            {% for character in series.characters %}
-        {% if character.photo %}
-        <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0  hai {% if series.is_animation_series %}animation-series{% endif %}">
-            <div class="custom-block custom-block-overlay">
-                <a href="#" class="custom-block-image-wrap">
-                    <img src="{{ character.photo }}" class="custom-block-image img-fluid" alt="{{ character.name }}">
-                </a>
-                <div class="custom-block-info custom-block-overlay-info">
-                    <h5 class="mb-1">
-                        {% if character.name %}
-                        {% if user.is_authenticated %}
-                            <a href="{% url 'chat_with_character' show_name=series.title character_name=character.name %}?character_image_url={{ character.photo }}" class="ni">{{ character.name }}</a>
-                        {% else %}
-                            <a href="{% url 'login' %}" class="ni">{{ character.name }}</a>
-                        {% endif %}
-                    </h5>
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'chat_with_character' show_name=series.title character_name=character.name %}?character_image_url={{ character.photo }}" class="btn custom-btn smoothscroll mt-3">Chat Now</a>
-                    {% else %}
-                        <a href="{% url 'login' %}" class="btn custom-btn smoothscroll mt-3">Chat Now</a>
-                    {% endif %}
-                    {% endif %}
-                </div>
+        <div class="col-lg-12 col-12">
+            <div class="section-title-wrap mb-5">
+                <h4 class="section-title" id="toggle-header">Characters</h4>
             </div>
         </div>
-    {% endif %}
-{% endfor %}
-
+        <div class="row">
+            {% for character in series.characters %}
+            <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0 hai character-view">
+                <div class="custom-block custom-block-overlay">
+                    <img src="{{ character.photo }}" alt="{{ character.name }}" class="img-fluid">
+                    <div class="custom-block-info custom-block-overlay-info">
+                        <h5 class="mb-1">
+                            {% if character.name %}
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'chat_with_character' show_name=series.encrypted_show_name|default_if_none:'' encrypted_character_name=character.encrypted_name|default_if_none:'' %}?character_image_url={{ character.encrypted_photo|default_if_none:'' }}" class="ni">{{ character.name }}</a>
+                            {% else %}
+                            <a href="{% url 'login' %}" class="ni">{{ character.name }}</a>
+                            {% endif %}
+                        </h5>
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'chat_with_character' show_name=series.encrypted_show_name|default_if_none:'' encrypted_character_name=character.encrypted_name|default_if_none:'' %}?character_image_url={{ character.encrypted_photo|default_if_none:'' }}" class="btn custom-btn smoothscroll mt-3">Chat Now</a>
+                        {% else %}
+                        <a href="{% url 'login' %}" class="btn custom-btn smoothscroll mt-3">Chat Now</a>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% if series.actors %}
+            {% for actor in series.actors %}
+            <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0 hai actor-view" style="display:none;">
+                <div class="custom-block custom-block-overlay">
+                    <img src="{{ actor.photo }}" alt="{{ actor.name }}" class="img-fluid">
+                    <div class="custom-block-info custom-block-overlay-info">
+                        <h5 class="mb-1">
+                            {% if actor.name %}
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'chat_with_character' show_name=series.encrypted_show_name|default_if_none:'' encrypted_character_name=actor.encrypted_name|default_if_none:'' %}?character_image_url={{ actor.encrypted_photo|default_if_none:'' }}&actor=true" class="ni">{{ actor.name }}</a>
+                            {% else %}
+                            <a href="{% url 'login' %}" class="ni">{{ actor.name }}</a>
+                            {% endif %}
+                        </h5>
+                        {% if user.is_authenticated %}
+                        
+                        <a href="{% url 'chat_with_character' show_name=series.encrypted_show_name|default_if_none:'' encrypted_character_name=actor.encrypted_name|default_if_none:'' %}?character_image_url={{ actor.encrypted_photo|default_if_none:'' }}&actor=true" class="btn custom-btn smoothscroll mt-3">Chat Now</a>
+                        {% else %}
+                        <a href="{% url 'login' %}" class="btn custom-btn smoothscroll mt-3">Chat Now</a>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
         </div>
     </div>
 </section>
 
-{% include 'footer.html' %}
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'js/owl.carousel.min.js' %}"></script>
+<script src="{% static 'js/custom.js' %}"></script>
+<script>
+    document.getElementById('toggle-view').addEventListener('click', function() {
+        var characterViews = document.querySelectorAll('.character-view');
+        var actorViews = document.querySelectorAll('.actor-view');
+        var button = document.getElementById('toggle-view');
+        var header = document.getElementById('toggle-header');
+
+        if (button.textContent === 'Chat by Actors') {
+            characterViews.forEach(function(view) {
+                view.style.display = 'none';
+            });
+
+            actorViews.forEach(function(view) {
+                view.style.display = 'block';
+            });
+
+            button.textContent = 'Chat Characters';
+            header.textContent = 'Actors';
+        } else {
+            characterViews.forEach(function(view) {
+                view.style.display = 'block';
+            });
+
+            actorViews.forEach(function(view) {
+                view.style.display = 'none';
+            });
+
+            button.textContent = 'Chat by Actors';
+            header.textContent = 'Characters';
+        }
+    });
+</script>
+

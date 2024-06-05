@@ -1,7 +1,9 @@
 from django.shortcuts import render
 import requests
+from datetime import datetime
 
 api_key1 = "8567907539df0a097b6f71deee2c4d22"
+
 
 def search(request):
     search_query = request.GET.get('search')
@@ -56,7 +58,18 @@ def search(request):
     return render(request, 'search_results.html', context)
 
 
+from django.shortcuts import render
+import requests
+from ChatCrewApp.utils import encrypt, decrypt  # Assuming you have encryption utility functions
 
+api_key1 = "8567907539df0a097b6f71deee2c4d22"
+
+
+from django.shortcuts import render
+import requests
+from ChatCrewApp.utils import encrypt, decrypt  # Assuming you have encryption utility functions
+
+api_key1 = "8567907539df0a097b6f71deee2c4d22"
 
 def result_detail(request, result_id, media_type):
     api_key = api_key1
@@ -82,22 +95,40 @@ def result_detail(request, result_id, media_type):
         thumbnail = result_data.get('poster_path')
         title = result_data.get('title') if media_type == 'movie' else result_data.get('name')
 
-        # Extract character names and photos
-        character_info = [{'name': character.get('character'), 'photo': f"https://image.tmdb.org/t/p/w500{character.get('profile_path')}"}
-                          for character in characters if character.get('profile_path')]
+        # Encrypt the title for use in URLs
+        encrypted_title = encrypt(title)
+
+        # Extract character names and photos, encrypt them
+        character_info = [
+            {
+                'name': character.get('character'),
+                'photo': f"https://image.tmdb.org/t/p/w500{character.get('profile_path')}",
+                'encrypted_name': encrypt(character.get('character')),
+                'encrypted_photo': encrypt(f"https://image.tmdb.org/t/p/w500{character.get('profile_path')}")
+            }
+            for character in characters if character.get('profile_path')
+        ]
+
+        # Extract actor names and photos, encrypt them
+        actor_info = [
+            {
+                'name': character.get('name'),
+                'photo': f"https://image.tmdb.org/t/p/w500{character.get('profile_path')}",
+                'encrypted_name': encrypt(character.get('name')),
+                'encrypted_photo': encrypt(f"https://image.tmdb.org/t/p/w500{character.get('profile_path')}")
+            }
+            for character in characters if character.get('profile_path')
+        ]
 
         # Check if the result is animated
-        is_animated = False
-        if 'genres' in result_data:
-            for genre in result_data['genres']:
-                if genre['name'].lower() == 'animation':
-                    is_animated = True
-                    break
+        is_animated = any(genre['name'].lower() == 'animation' for genre in result_data.get('genres', []))
 
         context = {
             'thumbnail': thumbnail,
             'title': title,
+            'encrypted_title': encrypted_title,
             'characters': character_info,
+            'actors': actor_info,
             'is_animated': is_animated
         }
         return render(request, 'result_detail.html', context)
@@ -105,6 +136,4 @@ def result_detail(request, result_id, media_type):
     except requests.RequestException as e:
         print(f"Request Exception: {e}")
         return render(request, 'error.html')
-
-
 

@@ -1,27 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+{% load static %}
+{% include 'navbar.html' %}
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            width: 400px;
+        .container1 {
+            width: 90%;
+            max-width: 400px;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             padding: 40px;
             box-sizing: border-box;
+            margin: 40px auto;
+            font-family: Arial, sans-serif;
+            margin-top: 150px;
         }
         h2 {
             text-align: center;
@@ -37,7 +27,7 @@
             margin-bottom: 10px;
             color: #666;
         }
-        input[type="text"], input[type="password"] {
+        input[type="email"], input[type="password"] {
             padding: 10px;
             margin-bottom: 20px;
             border: 1px solid #ccc;
@@ -71,47 +61,31 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container1">
         <h2>Login</h2>
+        {% if messages %}
+                {% for message in messages %}
+                    <div class="error-message">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.GET.next }}">
-            <label for="username">Username:</label>
-            <input type="text" name="username" required><br>
+            <label for="email">Email:</label>
+            <input type="email" name="email" required><br>
             <label for="password">Password:</label>
             <input type="password" name="password" required><br>
             <button type="submit">Login</button>
         </form>
         <div class="redirect-link">
             Don't have an account? <a href="{% url 'register' %}">Register</a>
+            <br>
+            <a href="{% url 'password_reset' %}">Forgot Password?</a>
         </div>
     </div>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'js/custom.js' %}"></script>
 </body>
-<!-- Your login.html template -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const loginForm = document.querySelector('#login-form');
-        loginForm.addEventListener('submit', function (event) {
-            event.preventDefault();  // Prevent default form submission
-            const formData = new FormData(loginForm);
-            fetch(loginForm.action, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = data.redirect_url;  // Redirect without reload
-                } else {
-                    // Handle error message
-                    alert(data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        });
-    });
-</script>
-
 </html>

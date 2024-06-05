@@ -1,0 +1,111 @@
+{% include 'navbar.html' %}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;;
+        }
+
+        .characters-container {
+            background: #ffffff;
+            border-radius: 45px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            text-align: center;
+            display: block;
+            margin:  0 auto;
+        }
+
+        .characters-container h2 {
+            margin-bottom: 25px;
+            font-size: 28px;
+            color: #333;
+        }
+
+        .character-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        .character-card {
+            background: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 10px;
+            text-align: center;
+            width: 180px;
+            transition: transform 0.3s;
+        }
+
+        .character-card:hover {
+            transform: scale(1.05);
+        }
+
+        .character-card img {
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+
+        .character-card h3 {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .character-card p {
+            font-size: 14px;
+            color: #777;
+            margin: 0;
+        }
+        .date-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .date-button:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container1">
+        {% if characters %}
+            <h1 style="text-align: center; margin-top: 50px;">Available <span style="color: green;">Online</span> Matches</h1>
+        <div class="characters-container">
+            
+            <div class="character-list">
+                {% for character in characters %}
+                <div class="character-card">
+                    {% if character.profile_path %}
+                        <img src="https://image.tmdb.org/t/p/w200{{ character.profile_path }}" alt="{{ character.character_name }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/100" alt="{{ character.character_name }}">
+                    {% endif %}
+                    <h3>{{ character.character_name }}</h3>
+                    <p>{{ character.movie_name }}</p>
+                    <p>Age: {{ character.character_age }}</p><br>
+                    <a href="{% url 'dating_chat' character.movie_name character.character_name %}">
+                    <button class="date-button">Date</button></a>
+                </div>
+                
+                {% endfor %}
+            </div>
+            {% else %}
+            <h1>No Matchs found</h1>
+            <a href="{% url 'date_characters' %}">
+            <span style="color: rgb(53, 137, 255); font-size: 15px;">Try again ?</span></a>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

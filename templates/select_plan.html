@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Plan</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 36px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap; /* Ensure items wrap on smaller screens */
+        }
+        .plan {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 300px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 10px; /* Added margin for better spacing on small screens */
+        }
+        .plan:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        .plan-title {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: #555;
+        }
+        .plan-price {
+            font-size: 24px;
+            margin-bottom: 25px;
+            color: #008cff;
+            font-weight: 500;
+        }
+        .plan-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 25px 0;
+            color: #666;
+        }
+        .plan-features li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 20px;
+        }
+        .plan-features li::before {
+            content: "✔";
+            position: absolute;
+            left: 0;
+            color: #007bff;
+            font-size: 16px;
+        }
+        .plan input[type="radio"] {
+            display: none;
+        }
+        .plan label {
+            cursor: pointer;
+            display: block;
+            border: 2px solid transparent;
+            padding: 10px;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+        .plan input[type="radio"]:checked + label {
+            border-color: #007bff;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            display: block;
+            margin: 0 auto;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Select a Plan</h1>
+        <div class="container">
+            <div class="plan">
+                <h2 class="plan-title">Monthly Plan</h2>
+                <p class="plan-price">$13 / month</p>
+                <ul class="plan-features">
+                    <li>Access to premium content</li>
+                    <li>Support via email</li>
+                    <li>Monthly updates</li>
+                </ul>
+                <form method="post" action="{% url 'payment_page' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="plan" value="monthly">
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+            <div class="plan">
+                <h2 class="plan-title">Yearly Plan</h2>
+                <p class="plan-price">$88 / year</p>
+                <ul class="plan-features">
+                    <li>Access to premium content</li>
+                    <li>Support via email</li>
+                    <li>Annual updates</li>
+                </ul>
+                <form method="post" action="{% url 'payment_page' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="plan" value="yearly">
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

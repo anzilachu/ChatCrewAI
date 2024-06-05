@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Include necessary meta tags, title, and stylesheets -->
+</head>
+<body>
+    <h1>Chat with Random Character from {{ show_name }}</h1>
+    
+    <div class="character">
+        <img src="{{ random_character.photo }}" alt="{{ random_character.name }}">
+        <h2>{{ random_character.name }}</h2>
+        <!-- Display conversation with random_character -->
+    </div>
+
+    <div class="characters">
+        <h2>Other Characters:</h2>
+        {% for character in other_characters %}
+            <div class="character">
+                <img src="{{ character.photo }}" alt="{{ character.name }}">
+                <a href="{% url 'chat_with_character' show_name=show_name character_name=character.name %}?character_image_url={{ character.photo }}" class="btn custom-btn smoothscroll mt-3">Chat with {{ character.name }}</a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Include necessary scripts -->
+</body>
+</html>

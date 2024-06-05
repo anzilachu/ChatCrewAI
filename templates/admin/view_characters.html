@@ -1,0 +1,12 @@
+
+
+{% block content %}
+  <h2>Characters Talked To by {{ user.username }}</h2>
+  <ul>
+    {% for character in characters %}
+      <li>
+        <a href="{% url 'admin:view_chat_history' user.id character.character_name %}">{{ character.character_name }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

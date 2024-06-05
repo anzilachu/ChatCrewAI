@@ -1,0 +1,181 @@
+{% load static %}
+{% include 'navbar.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roleplay Chats</title>
+    <style>
+        .container1 {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            margin: 20px auto;
+            border-radius: 10px;
+            margin-top: 100px;
+        }
+
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            max-width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .container1 button[type="submit"] {
+            padding: 10px 20px;
+            border: none;
+            background-color: #edebf7;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .container1 button[type="submit"]:hover {
+            background-color: #ffffff;
+        }
+
+        h1 {
+            text-align: center;
+            color: #6c5ce7;
+            font-size: 38px;
+        }
+
+        .conversation-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .conversation-item {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .conversation-item:hover {
+            background-color: #e9e9e9;
+        }
+
+        .conversation-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex: 1;
+            margin-left: 10px;
+        }
+
+        .character-names {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .chat-link {
+            color: #6c5ce7;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .chat-link:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            display: block;
+            width: 200px;
+            padding: 10px 20px;
+            margin: 10px 0;
+            background-color: #6c5ce7;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #ffffff;
+        }
+
+        .profile-picture {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+        @media screen and (max-width: 768px) {
+            .container1 {
+                width: 90%;
+                padding: 15px;
+            }
+            h1 {
+                font-size: 28px;
+            }
+            btn {
+                display: block;
+                width: 10px;
+                padding: 10px 20px;
+                margin: 10px 0;
+                background-color: #6c5ce7;
+                color: #fff;
+                text-align: center;
+                text-decoration: none;
+                border-radius: 5px;
+                font-weight: bold;
+                transition: background-color 0.3s ease;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container1">
+        {% if roleplay_chats %}
+        <h1>Roleplay Chats</h1>
+        <br>
+        <a href="{% url 'select_roleplay' %}" class="btn" text-align: center;">Start New Roleplay</a>
+        <ul class="conversation-list">
+            <!-- roleplay_chatted_characters.html -->
+        {% for chat in roleplay_chats %}
+        <li class="conversation-item">
+            <img src="{{ chat.character_image_url }}" alt="{{ chat.character_name }}" class="profile-picture">
+            <img src="{{ chat.opponent_image_url }}" alt="{{ chat.opponent_name }}" class="profile-picture">
+            <div class="conversation-details">
+                <div class="character-names">
+                    You: {{ chat.character_name }} | Opponent: {{ chat.opponent_name }}
+                </div>
+                <a href="{% url 'roleplay_chat' chat.encrypted_url %}" class="chat-link">Chat Again</a>
+            </div>
+        </li>
+        {% endfor %}
+
+        </ul>
+        
+        {% else %}
+        <h1>No Roleplay Chat Yet!</h1>
+        <a href="{% url 'select_roleplay' %}" class="btn">Start Roleplay</a>
+        {% endif %}
+    </div>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'js/custom.js' %}"></script>
+    
+    </body>
+    </html>

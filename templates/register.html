@@ -1,27 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
+{% load static %}
+{% include 'navbar.html' %}
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            width: 400px;
+        .container1 {
+            width: 550px;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             padding: 40px;
             box-sizing: border-box;
+            margin: 40px auto;
+            font-family: Arial, sans-serif;
         }
         h2 {
             text-align: center;
@@ -34,15 +22,20 @@
         }
         label {
             font-size: 16px;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             color: #666;
         }
-        input[type="text"], input[type="password"] {
-            padding: 10px;
+        input[type="text"], input[type="password"], input[type="email"] {
+            padding: 12px;
             margin-bottom: 20px;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
+            border-color: #007bff;
         }
         button {
             padding: 12px;
@@ -52,6 +45,7 @@
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
         button:hover {
             background-color: #0056b3;
@@ -70,30 +64,110 @@
         }
         .error-message {
             color: #ff0000;
-            margin-top: 5px;
+            margin-top: -15px;
+            margin-bottom: 15px;
             font-size: 14px;
+        }
+        .valid-feedback {
+            color: green;
+            font-size: 14px;
+        }
+        .invalid-feedback {
+            color: red;
+            font-size: 14px;
+        }
+        @media (max-width: 600px) {
+            .container1 {
+                padding: 20px;
+                width: 330px;
+            }
+            h2 {
+                font-size: 24px;
+            }
+            label, input[type="text"], input[type="password"], input[type="email"], button {
+                font-size: 14px;
+            }
+            .redirect-link {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container1">
         <h2>Register</h2>
+        {% if form.errors %}
+        <div class="error-message">
+            {% for error in form.non_field_errors %}
+                {{ error }}<br>
+            {% endfor %}
+        </div>
+        {% endif %}
         <form method="post">
             {% csrf_token %}
+    
             {{ form.username.label_tag }}
             {{ form.username }}
+            {% for error in form.username.errors %}
+                <div class="error-message">{{ error }}</div>
+            {% endfor %}
             <br>
+
+            {{ form.email.label_tag }}
+            {{ form.email }}
+            {% for error in form.email.errors %}
+                <div class="error-message">{{ error }}</div>
+            {% endfor %}
+            <br>
+
             {{ form.password1.label_tag }}
             {{ form.password1 }}
+            {% for error in form.password1.errors %}
+                <div class="error-message">{{ error }}</div>
+            {% endfor %}
+            <div id="password-feedback" class="invalid-feedback">Password must be at least 8 characters long, contain at least one special character, and at least one numeric character.</div>
             <br>
+    
             {{ form.password2.label_tag }}
             {{ form.password2 }}
+            {% for error in form.password2.errors %}
+                <div class="error-message">{{ error }}</div>
+            {% endfor %}
             <br>
+    
             <button type="submit">Register</button>
         </form>
         <div class="redirect-link">
             Already have an account? <a href="{% url 'login' %}">Login</a>
         </div>
     </div>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const passwordInput = document.querySelector('input[name="password1"]');
+            const feedback = document.getElementById("password-feedback");
+
+            passwordInput.addEventListener("input", function() {
+                const value = passwordInput.value;
+                const lengthValid = value.length >= 8;
+                const specialCharValid = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+                const numericValid = /\d/.test(value);
+
+                if (lengthValid && specialCharValid && numericValid) {
+                    feedback.textContent = "Password is valid.";
+                    feedback.classList.remove("invalid-feedback");
+                    feedback.classList.add("valid-feedback");
+                } else {
+                    feedback.textContent = "Password must be at least 8 characters long, contain at least one special character, and at least one numeric character.";
+                    feedback.classList.remove("valid-feedback");
+                    feedback.classList.add("invalid-feedback");
+                }
+            });
+        });
+    </script>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'js/custom.js' %}"></script>
 </body>
 </html>

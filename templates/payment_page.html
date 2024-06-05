@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Page</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #e2ebf0, #a0c4e2);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+        #pay-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        #pay-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        #pay-button:active {
+            transform: translateY(0);
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Complete Your Payment</h1>
+        <button id="pay-button">Pay Now</button>
+    </div>
+
+    <script>
+        var options = {
+            "key": "{{ razorpay_key_id }}",
+            "amount": "{{ amount }}",
+            "currency": "{{ currency }}",
+            "name": "ChatCrewAI",
+            "description": "Subscription Payment",
+            "order_id": "{{ order_id }}",
+            "handler": function (response){
+                var paymentForm = document.createElement('form');
+                paymentForm.action = "{% url 'payment_callback' %}";
+                paymentForm.method = 'POST';
+
+                var razorpayPaymentId = document.createElement('input');
+                razorpayPaymentId.type = 'hidden';
+                razorpayPaymentId.name = 'razorpay_payment_id';
+                razorpayPaymentId.value = response.razorpay_payment_id;
+
+                var razorpayOrderId = document.createElement('input');
+                razorpayOrderId.type = 'hidden';
+                razorpayOrderId.name = 'razorpay_order_id';
+                razorpayOrderId.value = response.razorpay_order_id;
+
+                var razorpaySignature = document.createElement('input');
+                razorpaySignature.type = 'hidden';
+                razorpaySignature.name = 'razorpay_signature';
+                razorpaySignature.value = response.razorpay_signature;
+
+                paymentForm.appendChild(razorpayPaymentId);
+                paymentForm.appendChild(razorpayOrderId);
+                paymentForm.appendChild(razorpaySignature);
+                document.body.appendChild(paymentForm);
+                paymentForm.submit();
+            },
+            "theme": {
+                "color": "#528FF0"
+            }
+        };
+
+        var rzp1 = new Razorpay(options);
+
+        document.getElementById('pay-button').onclick = function(e){
+            rzp1.open();
+            e.preventDefault();
+        }
+    </script>
+</body>
+</html>

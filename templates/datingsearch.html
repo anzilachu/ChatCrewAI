@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dating Form | ChatCrewAI</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #536fef 0%, #ffffff 100%);
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .form-container {
+            background: #ffffff;
+            padding: 100px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .form-container h2 {
+            margin-bottom: 25px;
+            font-size: 28px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        .gender-card-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .gender-card {
+            flex: 1;
+            padding: 15px;
+            margin: 5px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s, transform 0.2s;
+        }
+
+        .gender-card:hover {
+            transform: scale(1.05);
+        }
+
+        .gender-card input {
+            display: none;
+        }
+
+        .gender-card img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 10px;
+        }
+
+        .gender-card label {
+            display: block;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .gender-card.selected {
+            border-color: #007bff;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px 0;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .submit-btn:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .submit-btn:active {
+            transform: scale(1);
+        }
+
+        .loading-container {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 1000;
+        }
+
+        .loading-container .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #007bff;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Who are you looking for?</h2>
+        <form method="POST" action="{% url 'date_characters' %}" onsubmit="showLoading()">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <div class="gender-card-container">
+                    <div class="gender-card" onclick="selectGender('male')">
+                        <input type="radio" name="gender" id="male" value="male" required>
+                        <label for="male">
+                            <img src="https://img.icons8.com/ios-filled/50/007bff/male.png" alt="Male Icon">
+                            Male
+                        </label>
+                    </div>
+                    <div class="gender-card" onclick="selectGender('female')">
+                        <input type="radio" name="gender" id="female" value="female" required>
+                        <label for="female">
+                            <img src="https://img.icons8.com/ios-filled/50/ff69b4/female.png" alt="Female Icon">
+                            Female
+                        </label>
+                    </div>
+                    <div class="gender-card" onclick="selectGender('other')">
+                        <input type="radio" name="gender" id="other" value="other" required>
+                        <label for="other">
+                            <img src="https://img.icons8.com/ios-filled/50/6c63ff/gender-neutral-user.png" alt="Other Icon">
+                            Other
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="age">Age Category</label>
+                <select name="age" id="age" required>
+                    <option value="" disabled selected>Select your age category</option>
+                    <option value="18-35">18-35</option>
+                    <option value="35-45">35-45</option>
+                    <option value="45-65">45-65</option>
+                </select>
+            </div>
+            <button type="submit" class="submit-btn">Find a match</button>
+        </form>
+    </div>
+
+    <div class="loading-container" id="loading-container">
+        <div class="spinner"></div>
+        <p>Finding a match...</p>
+    </div>
+
+    <script>
+        function selectGender(gender) {
+            const cards = document.querySelectorAll('.gender-card');
+            cards.forEach(card => card.classList.remove('selected'));
+
+            const selectedCard = document.querySelector(`#${gender}`).closest('.gender-card');
+            selectedCard.classList.add('selected');
+            document.querySelector(`#${gender}`).checked = true;
+        }
+
+        function showLoading() {
+            document.querySelector('.form-container').style.display = 'none';
+            document.getElementById('loading-container').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
+

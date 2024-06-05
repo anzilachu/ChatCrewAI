@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fan Chat - {{ show_name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-header {
+            background-color: #6c5ce7;
+            color: #fff;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .exit-chat-button {
+            background-color: #304ed6;
+            color: #fff;
+            border: none;
+            padding: 5px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .exit-chat-button:hover {
+            background-color: #b33939;
+        }
+
+        .chat-history {
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+            scrollbar-width: thin;
+            scrollbar-color: #6c5ce7 #f0f0f0;
+        }
+
+        .chat-history::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-history::-webkit-scrollbar-thumb {
+            background-color: #1500b1;
+            border-radius: 10px;
+        }
+
+        .chat-message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #f0f0f0;
+            color: black;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .sent .message-content {
+            background-color: #8275e0;
+            color: white;
+            margin-left: auto;
+        }
+
+        .received .message-content {
+            background-color: #f0f0f0;
+            margin-right: auto;
+        }
+
+        .message-text {
+            margin: 0;
+            word-wrap: break-word;
+        }
+
+        .typing-indicator {
+            font-style: italic;
+            color: #999;
+        }
+
+        .chat-form-container {
+            bottom: 0;
+            width: 100%;
+            background-color: #fff;
+            border-top: 1px solid #eee;
+            box-sizing: border-box;
+            z-index: 1000;
+        }
+
+        .chat-form {
+            display: flex;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: #f0f0f0;
+            color: #333;
+            margin-right: 10px;
+        }
+
+        .send-button {
+            border: none;
+            background-color: #6c5ce7;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .send-button i {
+            margin-left: 5px;
+        }
+
+        .send-button:hover {
+            background-color: #4a3cc5;
+        }
+
+        @media (max-width: 768px) {
+            .chat-header h2 {
+                font-size: 1.2rem;
+            }
+
+            .exit-chat-button {
+                padding: 5px 10px;
+                font-size: 0.8rem;
+            }
+
+            .chat-history {
+                padding: 10px;
+            }
+
+            .chat-form {
+                padding: 10px;
+            }
+
+            .form-control {
+                font-size: 0.9rem;
+            }
+
+            .send-button {
+                padding: 5px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <button class="exit-chat-button" onclick="goBack()">Exit Chat</button>
+            <h2>Fan Chat - {{ show_name }}</h2>
+        </div>
+        <div class="chat-history" id="chat-history">
+            {% for message in conversation %}
+                <div class="chat-message {% if message.is_user_message %}sent{% else %}received{% endif %}" data-message-id="{{ message.id }}">
+                    <div class="message-content">
+                        <p class="message-text">{{ message.message }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="chat-form-container">
+            <form method="POST" class="chat-form" id="chat-form" action="{% url 'fan_chat' encrypted_show_name=encrypted_show_name %}">
+                {% csrf_token %}
+                <input type="text" class="form-control" name="user_input" id="user-input" placeholder="Type your message...">
+                <button type="submit" class="send-button">Send <i class="fas fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('.chat-form');
+            const chatHistory = document.getElementById('chat-history');
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const formData = new FormData(form);
+
+                // Display user's message immediately
+                const userMessageText = formData.get('user_input');
+                const userMessage = createMessageElement(userMessageText, true);
+                chatHistory.appendChild(userMessage);
+
+                // Scroll to the bottom of the chat history
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+
+                // Show typing indicator
+                const typingIndicator = document.createElement('div');
+                typingIndicator.classList.add('chat-message', 'received');
+                typingIndicator.innerHTML = '<div class="message-content typing-indicator">Typing...</div>';
+                chatHistory.appendChild(typingIndicator);
+
+                // Simulate a delay for the AI response
+                setTimeout(() => {
+                    // Remove typing indicator
+                    chatHistory.removeChild(typingIndicator);
+
+                    // Fetch AI response
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const aiResponse = createMessageElement(data.ai_response, false);
+                        chatHistory.appendChild(aiResponse);
+
+                        // Scroll to the bottom of the chat history
+                        chatHistory.scrollTop = chatHistory.scrollHeight;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                }, 3000); // 3-second delay
+
+                form.reset();
+            });
+        });
+
+        function createMessageElement(messageText, isUserMessage) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-message');
+            if (isUserMessage) {
+                messageElement.classList.add('sent');
+            } else {
+                messageElement.classList.add('received');
+            }
+
+            const messageContent = document.createElement('div');
+            messageContent.classList.add('message-content');
+
+            const messageTextElement = document.createElement('p');
+            messageTextElement.classList.add('message-text');
+            messageTextElement.textContent = messageText;
+
+            messageContent.appendChild(messageTextElement);
+            messageElement.appendChild(messageContent);
+
+            return messageElement;
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>
+

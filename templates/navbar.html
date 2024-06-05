@@ -59,7 +59,7 @@ https://templatemo.com/tm-584-pod-talk
 
         <main>
 
-            <nav class="navbar navbar-expand-lg" style="background-color: black;">
+            <nav class="navbar navbar-expand-lg">
                 <div class="container">
                     
                     <form action="{% url 'searchapp:search' %}" method="get" class="custom-form search-form flex-fill me-3" role="search">
@@ -84,6 +84,21 @@ https://templatemo.com/tm-584-pod-talk
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'about' %}">About</a>
                         </li>
+                        {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'payment_page' %}">Pricing</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Chats
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{% url 'chatted_characters' %}">Character chat</a></li>
+                                <li><a class="dropdown-item" href="{% url 'roleplay_chatted_characters' %}">roleplay chat</a></li>
+                            </ul>
+                        </li>
+                        {% endif %}
                         {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
